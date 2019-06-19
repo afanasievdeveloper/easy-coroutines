@@ -1,24 +1,40 @@
 package ua.afanasievdeveloper.easycoroutinescore.possibly
 
+/**
+ * Observer for [Possibly] result.
+ * @author A. Afanasiev (https://github.com/afanasievdeveloper).
+ */
 interface PossiblyObserver<T> {
 
-    fun onComplete()
+    /** Handle null. */
+    fun onComplete(): Unit?
 
-    fun onSuccess(value: T)
+    /** Handle result. */
+    fun onSuccess(value: T): Unit?
 
-    fun onFailure(error: Throwable)
+    /** Handle unsuccessful result. */
+    fun onFailure(error: Throwable): Unit?
 }
 
+/**
+ * @return Anonymous class for [PossiblyObserver].
+ *
+ * @param complete Callback for coroutine execution with null.
+ * @param success Callback for coroutine execution with result.
+ * @param failure Callback for unsuccessful execution.
+ *
+ * @author A. Afanasiev (https://github.com/afanasievdeveloper).
+ */
 @Suppress("FunctionName")
 fun <T> PossiblyObserver(
-    complete: () -> Unit,
-    success: (T) -> Unit,
-    failure: (Throwable) -> Unit
+    complete: (() -> Unit)?,
+    success: ((T) -> Unit)?,
+    failure: ((Throwable) -> Unit)?
 ) = object : PossiblyObserver<T> {
 
-    override fun onComplete() = complete()
+    override fun onComplete() = complete?.invoke()
 
-    override fun onSuccess(value: T) = success(value)
+    override fun onSuccess(value: T) = success?.invoke(value)
 
-    override fun onFailure(error: Throwable) = failure(error)
+    override fun onFailure(error: Throwable) = failure?.invoke(error)
 }
